@@ -1,0 +1,67 @@
+import os
+import shutil
+from pathlib import Path
+# Test folder
+SOURCE_FOLDER = Path(__file__).parent / "test_files"
+FILE_TYPES = {
+    ".pdf": "Documents",
+    ".docx": "Documents",
+    ".txt": "Documents",
+    ".jpg": "Images",
+    ".jpeg": "Images",
+    ".png": "Images",
+    ".mp4": "Videos",
+    ".mkv": "Videos",
+    ".zip": "Archives",
+    ".rar": "Archives",
+    
+    ".py": "Code",
+    ".cpp": "Code",
+    ".c": "Code",
+    ".java": "Code",
+    ".html": "Code",
+    ".css": "Code",
+    ".js": "Code"
+}
+def organize_files():
+    SOURCE_FOLDER.mkdir(exist_ok=True)
+    total_moved = 0
+    # Create category folders
+    for folder in set(FILE_TYPES.values()):
+        folder_path = SOURCE_FOLDER / folder
+        folder_path.mkdir(exist_ok=True)
+
+    # Scan files
+    for entry in os.scandir(SOURCE_FOLDER):
+
+        if entry.is_file():
+
+            file_path = Path(entry.path)
+            extension = file_path.suffix.lower()
+
+            if extension in FILE_TYPES:
+
+                folder = FILE_TYPES[extension]
+                destination = SOURCE_FOLDER / folder
+                new_path = destination / file_path.name
+
+                try:
+                    if new_path.exists():
+                        print(f"Already exists: {file_path.name}")
+                        continue
+
+                    shutil.move(str(file_path), str(new_path))
+                    total_moved += 1
+
+                    print(f"Moved: {file_path.name}")
+
+                except OSError as e:
+                    print(f"Error: {file_path.name} - {e}")
+
+    # Final summary
+    print("\n----- ORGANIZATION SUMMARY -----")
+    print(f"Total files relocated: {total_moved}")
+
+
+if __name__ == "__main__":
+    organize_files()
